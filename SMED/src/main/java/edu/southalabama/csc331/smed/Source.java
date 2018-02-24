@@ -59,6 +59,11 @@ public class Source {
 		String msg = msgQueue.take();
 		JsonReader jsonReader = Json.createReader(new StringReader(msg));
 		JsonObject message = jsonReader.readObject();
+		while(message.containsKey("delete")) {
+			msg = msgQueue.take();
+			jsonReader = Json.createReader(new StringReader(msg));
+			message = jsonReader.readObject();
+		}
 		return message;
 	}
 }

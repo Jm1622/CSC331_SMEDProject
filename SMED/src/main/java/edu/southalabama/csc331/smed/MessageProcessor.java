@@ -1,7 +1,10 @@
 package edu.southalabama.csc331.smed;
 
+
 import java.util.ArrayList;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -9,16 +12,9 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
 
 public class MessageProcessor {
-	private String[] keyWords= new String[10];
-	public MessageProcessor(String[] keyWords) {
-		for(int i =0; i<keyWords.length; i++) {
-			if(i<this.keyWords.length) {
-				this.keyWords[i] = keyWords[i];
-			}
-			else {
-				System.out.println("Too many keywords were provided, discarded "+keyWords[i] );
-			}
-		}
+	private ArrayList<String> keyWords= new ArrayList<String>();
+	public MessageProcessor(ArrayList<String> keyWords) {
+		this.keyWords = keyWords;
 	}
 	public JsonObject processMessage(JsonObject message) {
 		//Create a builder with all the current information because JsonObject is immutable
@@ -29,8 +25,13 @@ public class MessageProcessor {
 		int matchCount = 0;
 		//Count matches of keywords
 		for(String keyWord : keyWords) {
-			if(keyWord != null && !keyWord.isEmpty() && !message.containsKey("delete") && message.getString("text").contains(keyWord)) {
-				matchCount ++;
+			if(keyWord != null && !keyWord.isEmpty()) {
+				//Some regex which finds each occurence of the keyword plus a space so it is an independent word
+				Pattern p = Pattern.compile(keyWord+" ");
+				Matcher m = p.matcher(message.getString("text").toString());
+				while(m.find()) {
+					matchCount++;
+				}
 			}
 		}
 		//If we have a matchCount add it to the job
