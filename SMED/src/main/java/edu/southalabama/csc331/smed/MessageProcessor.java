@@ -27,7 +27,7 @@ public class MessageProcessor {
 		for(String keyWord : keyWords) {
 			if(keyWord != null && !keyWord.isEmpty()) {
 				//Some regex which finds each occurence of the keyword plus a space so it is an independent word
-				Pattern p = Pattern.compile(keyWord+" ");
+				Pattern p = Pattern.compile(" "+keyWord+" ");
 				Matcher m = p.matcher(message.getString("text").toString());
 				while(m.find()) {
 					matchCount++;

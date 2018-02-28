@@ -1,22 +1,17 @@
 package edu.southalabama.csc331.smed;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.json.JsonObject;
+import javax.swing.JFrame;
 
 public class Main 
 {
     public static void main( String[] args ) throws InterruptedException
     {
-    	ArrayList<String> keyWords = new ArrayList(Arrays.asList("The", "a", "Please"));
-    		MessageProcessor processor = new MessageProcessor(keyWords);
-    		Source twitterSource = new Source("Twitter");
-    		twitterSource.startMessageGetting();
-    		while(true) {
-    			JsonObject message = processor.processMessage(twitterSource.getMessage());
-    			System.out.println(message.get("place"));
-    			//System.out.println(twitterSource.getMessage());
-    		}
+    		
+	    	GUI eventDS = new GUI();
+		eventDS.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		eventDS.setSize(800,800);
+		eventDS.setVisible(true);
+		//eventDS.setResizable(false);
+		
     }
 }
