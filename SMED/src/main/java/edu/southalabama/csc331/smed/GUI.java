@@ -14,14 +14,15 @@ public class GUI extends JFrame{
 	private JButton startButton, stopButton, dlButton;
 	private String[] socialMediaChoices = {"Twitter"};
 	GridBagConstraints gbc = new GridBagConstraints();
+	// TODO the following variables should be associated with a controller class, not here. The action listeners can use that controller class
 	private Source source;
-	private boolean keepGetting = false;
 	private MessageLoopThread r;
 	private Thread thread;
 	private ArrayList<JsonObject> eventMessages = new ArrayList<JsonObject>();
 	private ArrayList<JsonObject> nonEventMessages = new ArrayList<JsonObject>();
 	public GUI(){
-		// Creates  the GUI and the layout
+		// Creates  the GUI and the layout, this was made by Ron so I do not know how most of this stuff works right now
+		// TODO make better looking and comment
 		super("Social Media Event Detection");
 		setLayout(new GridBagLayout());
 		selectionPanel = new JPanel(new FlowLayout());
@@ -116,35 +117,11 @@ public class GUI extends JFrame{
 		gbc.weightx = 0.1;
 		add(dlButton, gbc);
 	}
-	public Source getSource() {
-		return source;
-	}
-	public void setSource(Source source) {
-		this.source = source;
-	}
-	public boolean isKeepgetting() {
-		return keepGetting;
-	}
-	public void setKeepGetting(boolean keepGetting) {
-		this.keepGetting = keepGetting;
-	}
 	public void addEventMessage(String message) {
 		eventMessageText.setText(eventMessageText.getText()+message);
 	}
 	public void addNonEventMessage(String message) {
 		noneventMessageText.setText(noneventMessageText.getText()+message);
-	}
-	public void setMessageprocessingThread(MessageLoopThread r) {
-		this.r = r;
-	}
-	public MessageLoopThread getMessageProcessingThread() {
-		return r;
-	}
-	public void setThread(Thread thread) {
-		this.thread = thread;
-	}
-	public Thread getThread() {
-		return thread;
 	}
 	public String getKeyWords() {
 		return searchText.getText();
@@ -162,6 +139,25 @@ public class GUI extends JFrame{
 		noneventMessageText.setText("");
 		eventMessages.clear();
 		nonEventMessages.clear();
+	}
+	//TODO the below methods should be associated with the controller class
+	public Source getSource() {
+		return source;
+	}
+	public void setSource(Source source) {
+		this.source = source;
+	}
+	public void setMessageprocessingThread(MessageLoopThread r) {
+		this.r = r;
+	}
+	public MessageLoopThread getMessageProcessingThread() {
+		return r;
+	}
+	public void setThread(Thread thread) {
+		this.thread = thread;
+	}
+	public Thread getThread() {
+		return thread;
 	}
 	public void addEventMessage(JsonObject message) {
 		eventMessages.add(message);

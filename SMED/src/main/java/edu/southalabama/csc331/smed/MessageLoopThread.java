@@ -4,10 +4,13 @@ import javax.json.JsonObject;
 
 
 public class MessageLoopThread implements Runnable {
-	Source source;
-	boolean keepGoing;
-	GUI gui;
-	MessageProcessor processor;
+	//Private variables the the Message Loop Thread, a thread that just continuously gets messages, uses
+	private Source source;
+	private boolean keepGoing;
+	private GUI gui;
+	private MessageProcessor processor;
+	//Constructor that adds a value to all four of these variables
+	// TODO replace gui with a controller class
 	public MessageLoopThread(Source source, boolean keepGoing, GUI gui, MessageProcessor processor) throws InterruptedException {
 		this.source = source;
 		this.keepGoing = keepGoing;
@@ -15,10 +18,14 @@ public class MessageLoopThread implements Runnable {
 		this.processor = processor;
 	}
 	public void run() {
+		//This overrides runnables run method, this is what runs on the thread
 		while(keepGoing) {
+			//While that boolean is true
 			try {
+				//process a message from the source
 				JsonObject message = processor.processMessage(source.getMessage());
 				String output = "";
+				//Add certain attributes if they exist in the json we receive
 				if(message.get("text") != null) {
 					output += "Tweet: " + message.get("text").toString();
 				}
@@ -37,6 +44,7 @@ public class MessageLoopThread implements Runnable {
 						output += " Place: " + place.get("full_name").toString();
 					}
 				}
+				//Add to the appropriate box dependent on this last attribute
 				if(message.get("MatchCount") != null) {
 					output += " Match Count: "+ message.get("MatchCount").toString()+"\n";
 					gui.addEventMessage(output);
@@ -47,7 +55,6 @@ public class MessageLoopThread implements Runnable {
 					gui.addNonEventMessage(output);
 					gui.addNonEventMessage(message);
 				}
-				Thread.sleep(20);
 				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -55,7 +62,20 @@ public class MessageLoopThread implements Runnable {
 			}
 		}
 	}
+	//A method to put this to sleep if we ever need to
+	public void sleep(long time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	//Change the boolean, use this to end the thread.
 	public void setKeepGoing(boolean keepGoing) {
 		this.keepGoing = keepGoing;
+	}
+	public boolean getKeepGoing() {
+		return keepGoing;
 	}
 }

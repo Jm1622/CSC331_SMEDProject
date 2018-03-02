@@ -55,14 +55,21 @@ public class Source {
 		}
 	}
 	public JsonObject getMessage() throws InterruptedException {
-		//Take a message from the queue and create a JsonObject out of it
-		String msg = msgQueue.take();
-		JsonReader jsonReader = Json.createReader(new StringReader(msg));
-		JsonObject message = jsonReader.readObject();
-		while(message.containsKey("delete")) {
-			msg = msgQueue.take();
-			jsonReader = Json.createReader(new StringReader(msg));
+		//If no source matches return a null message
+		JsonObject message = null;
+		if(type.equals("Twitter")) {
+			//Take a message from the queue and create a JsonObject out of it
+			String msg = msgQueue.take();
+			//Create a json reader out of a string reader
+			JsonReader jsonReader = Json.createReader(new StringReader(msg));
+			//Read into a json
 			message = jsonReader.readObject();
+			//If it is a deleted message
+			while(message.containsKey("delete")) {
+				msg = msgQueue.take();
+				jsonReader = Json.createReader(new StringReader(msg));
+				message = jsonReader.readObject();
+			}
 		}
 		return message;
 	}
