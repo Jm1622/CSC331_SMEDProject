@@ -12,9 +12,6 @@ public class StartDetectingActionListener implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		//Use the parents of the Button to get back to the GUI
 		GUI gui = (GUI)((JButton)e.getSource()).getParent().getParent().getParent().getParent();
-		//if the thread does exist, put it to sleep for 100 seconds
-		if(gui.getMessageProcessingThread()!= null)
-			gui.getMessageProcessingThread().sleep(100);
 		try {
 			//If we have a source selected
 			if(gui.getDropdownText() != null) {
@@ -25,17 +22,8 @@ public class StartDetectingActionListener implements ActionListener{
 					gui.clearMessages();
 					//Populate the keyword list and create a message processor and source
 					ArrayList<String> keyWords = new ArrayList<String>(Arrays.asList(gui.getKeyWords().split(",")));
-					MessageProcessor processor = new MessageProcessor(keyWords);
-					Source source = new Source(gui.getDropdownText());
-					//Make the source startMessageGetting, this puts it where it is connected with source
-					source.startMessageGetting();
-					//Change the gui's source, keepGetting to our new values
-					gui.setSource(source);
-					//Create the messageLoopThread, and create a thread around this class and start it
-					// TODO link these things to a controller instead of the gui class
-					gui.setMessageprocessingThread(new MessageLoopThread(source, true, gui, processor));
-					gui.setThread(new Thread(gui.getMessageProcessingThread()));
-					gui.getThread().start();
+					gui.getController().startProcessing(keyWords, gui.getDropdownText(), gui);
+					
 				}
 				else {
 					//If no keywords exist, alert the user that we need some keywords

@@ -20,13 +20,13 @@ import com.twitter.hbc.httpclient.auth.OAuth1;
 
 public class Source {
 	//The twitter client
-	private Client hoseBirdClient;
+	private Client f_hoseBirdClient;
 	//The place we store our messages
-	private BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(100000);
+	private BlockingQueue<String> f_msgQueue = new LinkedBlockingQueue<String>(100000);
 	//What type of source this is
-	private String type;
+	private String f_type;
 	public Source(String type) throws InterruptedException {
-		this.type = type;
+		this.f_type = type;
 		if(type.equals("Twitter")) {
 			//Code stolen from HBC's github, this connects to the twitter API with our applications keys
 			Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
@@ -36,41 +36,61 @@ public class Source {
 					  .hosts(hosebirdHosts)
 					  .authentication(hosebirdAuth)
 					  .endpoint(sampleStatuses)
-					  .processor(new StringDelimitedProcessor(msgQueue));
-			hoseBirdClient = builder.build();
+					  .processor(new StringDelimitedProcessor(f_msgQueue));
+			f_hoseBirdClient = builder.build();
 		}
 	}
 	public void startMessageGetting() throws InterruptedException {
-		if(type.equals("Twitter")) {
+		if(f_type.equals("Twitter")) {
 			//If we were doing twitter connect to the client which starts filling our message queue with json like strings
-			hoseBirdClient.connect();
+			f_hoseBirdClient.connect();
 		}
 	}
 	public void stopMessageGetting() {
-		if(type.equals("Twitter")) {
+		if(f_type.equals("Twitter")) {
 			//Stop the connection
-			hoseBirdClient.stop();
+			f_hoseBirdClient.stop();
 			//Remove all excess items when connection ended
-			msgQueue.clear();
+			f_msgQueue.clear();
 		}
 	}
-	public JsonObject getMessage() throws InterruptedException {
+	public Message getMessage() throws InterruptedException {
 		//If no source matches return a null message
 		JsonObject message = null;
-		if(type.equals("Twitter")) {
+		Message outputMessage = new Message();
+		if(f_type.equals("Twitter")) {
 			//Take a message from the queue and create a JsonObject out of it
-			String msg = msgQueue.take();
+			String msg = f_msgQueue.take();
 			//Create a json reader out of a string reader
 			JsonReader jsonReader = Json.createReader(new StringReader(msg));
 			//Read into a json
 			message = jsonReader.readObject();
 			//If it is a deleted message
 			while(message.containsKey("delete")) {
-				msg = msgQueue.take();
+				msg = f_msgQueue.take();
 				jsonReader = Json.createReader(new StringReader(msg));
 				message = jsonReader.readObject();
 			}
+			if(message.get("user") != null) {
+				JsonObject user = message.getJsonObject("user");
+				if(user.get("screen_name") != null) {
+					outputMessage.setUser(user.get("screen_name").toString());
+				}
+			}
+			if(message.get("place") != null) {
+				if(!message.get("place").toString().equals("null")) {
+					JsonObject place = message.getJsonObject("place");
+					outputMessage.setLocation(place.get("full_name").toString());
+				}
+			}
+			if(message.get("text") != null) {
+				outputMessage.setText(message.get("text").toString());
+			}
+			outputMessage.setMessageType(f_type);
 		}
-		return message;
+		return outputMessage;
+	}
+	public String getType() {
+		return f_type;
 	}
 }

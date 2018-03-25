@@ -1,8 +1,5 @@
 package edu.southalabama.csc331.smed;
 import java.awt.*;
-import java.util.ArrayList;
-
-import javax.json.JsonObject;
 import javax.swing.*;
 public class GUI extends JFrame{
 	private static final long serialVersionUID = -9091569339266269626L;
@@ -14,14 +11,9 @@ public class GUI extends JFrame{
 	private JButton startButton, stopButton, dlButton;
 	private String[] socialMediaChoices = {"Twitter"};
 	GridBagConstraints gbc = new GridBagConstraints();
-	// TODO the following variables should be associated with a controller class, not here. The action listeners can use that controller class
-	private Source source;
-	private MessageLoopThread r;
-	private Thread thread;
-	private ArrayList<JsonObject> eventMessages = new ArrayList<JsonObject>();
-	private ArrayList<JsonObject> nonEventMessages = new ArrayList<JsonObject>();
+	SMEDController f_controller = new SMEDController(this);
 	public GUI(){
-		// Creates  the GUI and the layout, this was made by Ron so I do not know how most of this stuff works right now
+		// Creates  the GUI and the layout, this was made by Ron so I do not know how most of this stuff works right now, I added and improved some tings but still primarily ron's design choices
 		// TODO make better looking and comment
 		super("Social Media Event Detection");
 		setLayout(new GridBagLayout());
@@ -35,6 +27,7 @@ public class GUI extends JFrame{
 		selectionPanel.add(dropDown);
 		
 		searchText = new JTextArea(10,0);
+		searchText.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 18) );
 		searchText.setLineWrap(true);
         searchText.setWrapStyleWord(true);
         
@@ -43,6 +36,7 @@ public class GUI extends JFrame{
         searchPane.setViewportView(searchText);
 		
         eventMessageText = new JTextArea(10,0);
+        eventMessageText.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 18) );
         eventMessageText.setLineWrap(true);
         eventMessageText.setWrapStyleWord(true);
         eventMessageText.setEditable(false);
@@ -52,6 +46,7 @@ public class GUI extends JFrame{
         eventMessagePane.setViewportView(eventMessageText);
 		
         noneventMessageText = new JTextArea(10,0);
+        noneventMessageText.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 18) );
         noneventMessageText.setLineWrap(true);
         noneventMessageText.setWrapStyleWord(true);
         noneventMessageText.setEditable(false);
@@ -137,39 +132,11 @@ public class GUI extends JFrame{
 	public void clearMessages() {
 		eventMessageText.setText("");
 		noneventMessageText.setText("");
-		eventMessages.clear();
-		nonEventMessages.clear();
 	}
-	//TODO the below methods should be associated with the controller class
-	public Source getSource() {
-		return source;
+	public SMEDController getController() {
+		return f_controller;
 	}
-	public void setSource(Source source) {
-		this.source = source;
-	}
-	public void setMessageprocessingThread(MessageLoopThread r) {
-		this.r = r;
-	}
-	public MessageLoopThread getMessageProcessingThread() {
-		return r;
-	}
-	public void setThread(Thread thread) {
-		this.thread = thread;
-	}
-	public Thread getThread() {
-		return thread;
-	}
-	public void addEventMessage(JsonObject message) {
-		eventMessages.add(message);
-	}
-	public void addNonEventMessage(JsonObject message) {
-		nonEventMessages.add(message);
-	}
-	public ArrayList<JsonObject> getEventMessages() {
-		return eventMessages;
-	}
-	public ArrayList<JsonObject> getNonEventMessages() {
-		return nonEventMessages;
-	}
+	
+	
 }
 
