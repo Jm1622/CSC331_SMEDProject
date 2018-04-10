@@ -4,35 +4,83 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SMEDController {
-	private Source f_source;
+	private ArrayList<Source> f_sources = new ArrayList<Source>();
 	private MessageProcessor f_processor;
 	private MessageLoopThread f_loopThread;
 	private Thread f_thread;
 	private GUI f_gui;
+	private Timer f_timer = new Timer();
 	ArrayList<Message> f_eventMessages = new ArrayList<Message>();
 	ArrayList<Message> f_nonEventMessages = new ArrayList<Message>();
 	public SMEDController(GUI gui) {
 		this.f_gui = gui;
 	}
-	public void startProcessing(ArrayList<String> keyWords, String sourceType, GUI gui) throws InterruptedException {
+	public void startProcessing(ArrayList<String> keyWords, ArrayList<String> sourceTypes, GUI gui) throws InterruptedException {
 		if(f_loopThread != null) {
 			f_loopThread.setKeepGoing(false);
 		}
-		f_source = new Source(sourceType);
-		f_source.startMessageGetting();
+		sourceTypes.forEach(sourceType->{
+			try {
+				f_sources.add(new Source(sourceType));
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+		f_sources.forEach(source->{
+			try {
+				source.startMessageGetting();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 		f_processor = new MessageProcessor(keyWords);
-		f_loopThread = new MessageLoopThread(f_source, true, f_processor, f_gui, this);
+		f_loopThread = new MessageLoopThread(f_sources, true, f_processor, f_gui, this);
 		f_thread = new Thread(f_loopThread);
 		f_thread.start();
 	}
+	public void pauseProcessing(long time) {
+		StringBuilder f_lock = new StringBuilder("");
+		if(f_loopThread != null) {
+			synchronized(f_lock) {
+				f_lock.replace(0, f_lock.length(), "Lock");
+			}
+			//If any existing tasks exist cancel them, we will create a new one
+			f_timer.cancel();
+			f_timer = new Timer();
+			f_timer.schedule(new TimerTask() {
+					private StringBuilder f_lock = new StringBuilder("");
+					@Override
+					public void run() {
+					synchronized(f_lock) {
+						f_lock.replace(0, f_lock.length(), "Unlocked");
+						f_lock.notify();
+					}
+					}
+				}, time);
+				
+		}
+	}
+	public void restartThread() {
+		if(f_loopThread != null) {
+			f_thread = new Thread(f_loopThread);
+			f_thread.start();
+		}
+	}
+	
 	public boolean endProcessing() {
 		if(f_loopThread != null) {
-			f_loopThread.sleep(100);
+			this.pauseProcessing(10000);
 		}
-		if(f_source != null) {
-			f_source.stopMessageGetting();
+		if(f_sources != null) {
+			f_sources.forEach(source->{
+				source.stopMessageGetting();
+			});
 			f_loopThread.setKeepGoing(false);
 			return true;
 		}
@@ -83,11 +131,11 @@ public class SMEDController {
 	public void setPrcessor(MessageProcessor processor) {
 		this.f_processor = processor;
 	}
-	public Source getSource() {
-		return f_source;
+	public ArrayList<Source> getSources() {
+		return f_sources;
 	}
-	public void setSource(Source source) {
-		this.f_source = source;
+	public void setSource(ArrayList<Source> sources) {
+		this.f_sources = sources;
 	}
 	public void setMessageprocessingThread(MessageLoopThread thread) {
 		this.f_loopThread = thread;

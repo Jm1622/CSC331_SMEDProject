@@ -4,26 +4,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 public class StartDetectingActionListener implements ActionListener{
-	
+	private GUI f_gui;
+	public StartDetectingActionListener(GUI gui) {
+		this.f_gui = gui;
+	}
 	public void actionPerformed(ActionEvent e) {
 		//Use the parents of the Button to get back to the GUI
-		GUI gui = (GUI)((JButton)e.getSource()).getParent().getParent().getParent().getParent();
 		try {
 			//If we have a source selected
-			if(gui.getDropdownText() != null) {
+			if(f_gui.getSelectedSources() != null) {
 				//Set the keyWords
-				String words = gui.getKeyWords();
+				String words = f_gui.getKeyWords();
+				
 				if(!words.equals("")) {
 					//Clear all messages since we are starting again
-					gui.clearMessages();
+					f_gui.clearMessages();
 					//Populate the keyword list and create a message processor and source
-					ArrayList<String> keyWords = new ArrayList<String>(Arrays.asList(gui.getKeyWords().split(",")));
-					gui.getController().startProcessing(keyWords, gui.getDropdownText(), gui);
-					
+					ArrayList<String> keyWords = new ArrayList<String>(Arrays.asList(f_gui.getKeyWords().split(",")));
+					f_gui.getController().startProcessing(keyWords, f_gui.getSelectedSources(), f_gui);
+					f_gui.disableKeyWordSearch();
 				}
 				else {
 					//If no keywords exist, alert the user that we need some keywords

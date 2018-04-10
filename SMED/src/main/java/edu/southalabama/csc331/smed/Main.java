@@ -7,11 +7,12 @@ public class Main
     public static void main( String[] args ) throws InterruptedException
     {
     		//Builds gui and then sets it to be visible
+    		JFrame frame = new JFrame("Social Media Event Detection");
 	    	GUI eventDS = new GUI();
-		eventDS.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		eventDS.setSize(800,800);
-		eventDS.setVisible(true);
-		//eventDS.setResizable(false);
+	    	frame.setSize(1153, 720);
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    frame.add(eventDS);
+	    frame.setVisible(true);
 		
     }
 }

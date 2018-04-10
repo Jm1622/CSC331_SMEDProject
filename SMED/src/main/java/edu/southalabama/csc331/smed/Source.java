@@ -39,6 +39,9 @@ public class Source {
 					  .processor(new StringDelimitedProcessor(f_msgQueue));
 			f_hoseBirdClient = builder.build();
 		}
+		if(type.equals("YouTube")) {
+			
+		}
 	}
 	public void startMessageGetting() throws InterruptedException {
 		if(f_type.equals("Twitter")) {
@@ -86,7 +89,7 @@ public class Source {
 			if(message.get("text") != null) {
 				outputMessage.setText(message.get("text").toString());
 			}
-			outputMessage.setMessageType(f_type);
+			outputMessage.setMessageType("Tweet");
 		}
 		return outputMessage;
 	}

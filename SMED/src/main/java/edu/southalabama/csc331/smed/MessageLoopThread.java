@@ -1,16 +1,21 @@
 package edu.southalabama.csc331.smed;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class MessageLoopThread implements Runnable {
 	//Private variables the the Message Loop Thread, a thread that just continuously gets messages, uses
-	private Source f_source;
+	private ArrayList<Source> f_sources;
 	private boolean f_keepGoing;
 	private GUI f_gui;
 	private MessageProcessor f_processor;
 	private SMEDController f_controller;
+	private StringBuilder f_lock = new StringBuilder("Unlocked");
+	private Random f_numberGenerator = new Random();
 	//Constructor that adds a value to all four of these variables
 	// TODO replace gui with a controller class
-	public MessageLoopThread(Source source, boolean keepGoing, MessageProcessor processor, GUI gui, SMEDController controller) throws InterruptedException {
-		this.f_source = source;
+	public MessageLoopThread(ArrayList<Source> sources, boolean keepGoing, MessageProcessor processor, GUI gui, SMEDController controller) throws InterruptedException {
+		this.f_sources = sources;
 		this.f_keepGoing = keepGoing;
 		this.f_processor = processor;
 		this.f_gui = gui;
@@ -18,41 +23,41 @@ public class MessageLoopThread implements Runnable {
 	}
 	public void run() {
 		//This overrides runnables run method, this is what runs on the thread
-		while(f_keepGoing) {
-			//While that boolean is true
-			try {
-				//process a message from the source
-				Message message = f_processor.processMessage(f_source.getMessage());
-				//Add to the appropriate box dependent on this last attribute
-				if(message.getMatchCount() > 0) {
-					f_controller.addEventMessage(message);
-					f_gui.addEventMessage(message.toString());
+			while(f_keepGoing) {
+				//While that boolean is true
+				try {
+					synchronized(f_lock) {
+						if(f_lock.toString().equals("Lock")) {
+							f_lock.wait();
+						}
+					}
+					//process a message from a random source in the list
+					Message message = f_processor.processMessage(f_sources.get(f_numberGenerator.nextInt(f_sources.size())).getMessage());
+					//Add to the appropriate box dependent on this last attribute
+					if(message.getMatchCount() > 0) {
+						f_controller.addEventMessage(message);
+						f_gui.addEventMessage(message.toString());
+					}
+					else{
+						f_controller.addEventMessage(message);
+						f_gui.addNonEventMessage(message.toString());
+					}
+					
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				else{
-					f_controller.addEventMessage(message);
-					f_gui.addNonEventMessage(message.toString());
-				}
-				
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
-	}
-	//A method to put this to sleep if we ever need to
-	public void sleep(long time) {
-		try {
-			Thread.sleep(time);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	
 	//Change the boolean, use this to end the thread.
 	public void setKeepGoing(boolean keepGoing) {
 		this.f_keepGoing = keepGoing;
 	}
 	public boolean getKeepGoing() {
 		return f_keepGoing;
+	}
+	public StringBuilder getLock() {
+		return f_lock;
 	}
 }
