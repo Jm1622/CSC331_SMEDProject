@@ -53,10 +53,10 @@ public class Message {
 		String output ="";
 		output += f_messageType+": " + f_text;
 		if(!f_user.equals("")) {
-			output +="User name: "+f_user;
+			output +=" User name: "+f_user;
 		}
 		if(!f_location.equals("")) {
-			output +="Location: "+f_location;
+			output +=" Location: "+f_location;
 		}
 		if(f_matchCount > 0) {
 			output += " Match Count: "+ f_matchCount+"\n";

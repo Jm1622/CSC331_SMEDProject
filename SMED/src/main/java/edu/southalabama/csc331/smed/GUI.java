@@ -122,7 +122,6 @@ public class GUI extends javax.swing.JPanel{
         searchFor.setColumns(20);
         searchFor.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         searchFor.setRows(5);
-        searchFor.setText("Use commas to separate keywords");
         searchFor.setToolTipText("User commas to separate");
         jScrollPane1.setViewportView(searchFor);
 
@@ -144,7 +143,7 @@ public class GUI extends javax.swing.JPanel{
 
         titleSearch.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         titleSearch.setForeground(new java.awt.Color(255, 255, 255));
-        titleSearch.setText("Search for:");
+        titleSearch.setText("Search for: (Use commas to separate keywords)");
 
         titleEvent.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         titleEvent.setForeground(new java.awt.Color(255, 255, 255));
@@ -292,6 +291,9 @@ public class GUI extends javax.swing.JPanel{
 
         header.getAccessibleContext().setAccessibleName("Title");
         header.getAccessibleContext().setAccessibleDescription("");
+        eventMessages.setEditable(false);
+        nonEventMessages.setEditable(false);
+        stop.setEnabled(false);
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -360,6 +362,30 @@ public class GUI extends javax.swing.JPanel{
 		else {
 			return sources;
 		}
+	}
+	public void disableStartButton() {
+		this.start.setEnabled(false);
+	}
+	public void enableStartButton() {
+		this.start.setEnabled(true);
+	}
+	public void disableStopButton() {
+		this.stop.setEnabled(false);
+	}
+	public void enableStopButton() {
+		this.stop.setEnabled(true);
+	}
+	public void disableDownloadButton() {
+		this.download.setEnabled(false);
+	}
+	public void enableDownloadButton() {
+		this.download.setEnabled(true);
+	}
+	public void disableMapButton() {
+		this.map.setEnabled(false);
+	}
+	public void enableMapButton() {
+		this.map.setEnabled(true);
 	}
 	
 	

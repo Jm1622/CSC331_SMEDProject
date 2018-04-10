@@ -12,6 +12,7 @@ public class StartDetectingActionListener implements ActionListener{
 		this.f_gui = gui;
 	}
 	public void actionPerformed(ActionEvent e) {
+		f_gui.disableStartButton();
 		//Use the parents of the Button to get back to the GUI
 		try {
 			//If we have a source selected
@@ -26,15 +27,17 @@ public class StartDetectingActionListener implements ActionListener{
 					ArrayList<String> keyWords = new ArrayList<String>(Arrays.asList(f_gui.getKeyWords().split(",")));
 					f_gui.getController().startProcessing(keyWords, f_gui.getSelectedSources(), f_gui);
 					f_gui.disableKeyWordSearch();
+					f_gui.enableStopButton();
 				}
 				else {
 					//If no keywords exist, alert the user that we need some keywords
 					JOptionPane.showMessageDialog(null, "No keywords were entered, please enter some and start again!");
+					f_gui.enableStartButton();
 				}
 			}
 			else {
-				//Currently impossible with our gui, but if there is no source selected alert user
 				JOptionPane.showMessageDialog(null,"No source selected");
+				f_gui.enableStartButton();
 			}
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
