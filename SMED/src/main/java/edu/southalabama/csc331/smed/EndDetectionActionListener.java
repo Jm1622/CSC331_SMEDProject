@@ -18,5 +18,6 @@ public class EndDetectionActionListener implements ActionListener{
 		}
 		f_gui.enableKeyWordSearch();
 		f_gui.enableStartButton();
+		f_gui.enableScrolling();
 	}
 }

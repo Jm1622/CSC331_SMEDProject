@@ -1,10 +1,10 @@
 package edu.southalabama.csc331.smed;
-import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.JScrollPane;
 public class GUI extends javax.swing.JPanel{
 	 /**
      * Creates new form Main
@@ -325,10 +325,10 @@ public class GUI extends javax.swing.JPanel{
     private SMEDController f_controller = new SMEDController(this);
     // End of variables declaration//GEN-END:variables
 	public void addEventMessage(String message) {
-		eventMessages.setText(eventMessages.getText()+message);
+		eventMessages.setText(message+eventMessages.getText());
 	}
 	public void addNonEventMessage(String message) {
-		nonEventMessages.setText(nonEventMessages.getText()+message);
+		nonEventMessages.setText(message+nonEventMessages.getText());
 	}
 	public String getKeyWords() {
 		return searchFor.getText();
@@ -387,7 +387,14 @@ public class GUI extends javax.swing.JPanel{
 	public void enableMapButton() {
 		this.map.setEnabled(true);
 	}
-	
+	public void disableScrolling() {
+		this.jScrollPane2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		this.jScrollPane3.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+	}
+	public void enableScrolling() {
+		this.jScrollPane2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		this.jScrollPane3.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	}
 	
 }
 

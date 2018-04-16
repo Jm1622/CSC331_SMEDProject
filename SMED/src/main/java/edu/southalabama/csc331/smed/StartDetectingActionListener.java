@@ -28,6 +28,7 @@ public class StartDetectingActionListener implements ActionListener{
 					f_gui.getController().startProcessing(keyWords, f_gui.getSelectedSources(), f_gui);
 					f_gui.disableKeyWordSearch();
 					f_gui.enableStopButton();
+					f_gui.disableScrolling();
 				}
 				else {
 					//If no keywords exist, alert the user that we need some keywords
