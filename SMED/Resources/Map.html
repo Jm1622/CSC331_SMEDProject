@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Marker Clustering</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      /*taken from https://stackoverflow.com/questions/41602344/strange-chracters-in-google-maps-api-using-java-webview disabling some fonts so they don't show garbled text*/
+      .gm-style-mtc > div, .gm-style > div, .gm-style-cc > div, .gm-style {font-family:sans-serif !important;}
+    </style>
+  </head>
+  <body>
+  <button onclick= "refreshLocations()">Refresh locations</button>
+    <div id="map"></div>
+    <script>
+	var locations = [];
+	//Below function taken from google maps API for a cluster
+      function initMap() {
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 3,
+          center: {lat: -28.024, lng: 140.887}
+        });
+
+        // Create an array of alphabetical characters used to label the markers.
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        // Add some markers to the map.
+        // Note: The code uses the JavaScript Array.prototype.map() method to
+        // create an array of markers based on a given "locations" array.
+        // The map() method here has nothing to do with the Google Maps API.
+        var markers = locations.map(function(location, i) {
+          return new google.maps.Marker({
+            position: location,
+            label: labels[i % labels.length]
+          });
+        });
+
+        // Add a marker clusterer to manage the markers.
+        var markerCluster = new MarkerClusterer(map, markers,
+            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+      }
+      function refreshLocations(){
+      locations = [];
+      //read a local file using the XMLHttpRequest, this does not work in chrome but doesn't matter for us
+	  	var rawFile = new XMLHttpRequest();
+      	rawFile.open("GET", "locations.txt", false);
+      	rawFile.onreadystatechange = function (){
+        	if(rawFile.readyState === 4){
+            	if(rawFile.status === 200 || rawFile.status == 0){
+            		//read in the file
+                	var allText = rawFile.responseText;
+                	var tempArray = []
+                	tempArray = allText.split('|');
+                	//Split it pipe delimited then for each split split it by commas and create a point for that
+                	tempArray.forEach(function(element){
+                		var values = element.split(',');
+                		locations.push(new google.maps.LatLng(values[0],values[1]));
+                });
+                console.log(locations);
+                	if(locations !== []){
+                		//If we have locations reinitialize the map
+                		initMap();
+                	}
+            	}
+        	}
+        }
+        rawFile.send(null);
+  }
+    </script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDGbZZj04HYbmI4kx4FlPSMNu_-AwRzIBw&callback=initMap">
+    </script>
+  </body>
+</html>
