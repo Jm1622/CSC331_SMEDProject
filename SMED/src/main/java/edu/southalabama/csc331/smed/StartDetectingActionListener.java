@@ -23,6 +23,7 @@ public class StartDetectingActionListener implements ActionListener{
 				if(!words.equals("")) {
 					//Clear all messages since we are starting again
 					f_gui.clearMessages();
+					f_gui.getController().clearMessages();
 					//Populate the keyword list and create a message processor and source
 					ArrayList<String> keyWords = new ArrayList<String>(Arrays.asList(f_gui.getKeyWords().split(",")));
 					f_gui.getController().startProcessing(keyWords, f_gui.getSelectedSources(), f_gui);

@@ -20,9 +20,11 @@ public class SMEDController {
 		this.f_gui = gui;
 	}
 	public void startProcessing(ArrayList<String> keyWords, ArrayList<String> sourceTypes, GUI gui) throws InterruptedException {
+		//if a thread exists end it
 		if(f_loopThread != null) {
 			f_loopThread.setKeepGoing(false);
 		}
+		//Create a new source for each provided type
 		sourceTypes.forEach(sourceType->{
 			try {
 				f_sources.add(new Source(sourceType));
@@ -31,6 +33,7 @@ public class SMEDController {
 				e.printStackTrace();
 			}
 		});
+		//Start getting for each source
 		f_sources.forEach(source->{
 			try {
 				source.startMessageGetting();
@@ -39,12 +42,22 @@ public class SMEDController {
 				e.printStackTrace();
 			}
 		});
+		//Create a processor
 		f_processor = new MessageProcessor(keyWords);
-		f_loopThread = new MessageLoopThread(f_sources, true, f_processor, f_gui, this);
+		try {
+			//Create a messageloopthread with these components and run it
+			f_loopThread = new MessageLoopThread(f_sources, true, f_processor, f_gui, this);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		f_thread = new Thread(f_loopThread);
 		f_thread.start();
 	}
 	public void pauseProcessing(long time) {
+		//This is a method to try to pauseProcessing for a given amount of time
+		//Not used also does not really work
 		StringBuilder f_lock = new StringBuilder("");
 		if(f_loopThread != null) {
 			synchronized(f_lock) {
@@ -67,6 +80,7 @@ public class SMEDController {
 		}
 	}
 	public void restartThread() {
+		//If the loop thread exists create a new thread
 		if(f_loopThread != null) {
 			f_thread = new Thread(f_loopThread);
 			f_thread.start();
@@ -76,17 +90,23 @@ public class SMEDController {
 	public boolean endProcessing() {
 		if(f_loopThread != null) {
 			this.pauseProcessing(10000);
-		}
-		if(f_sources != null) {
-			f_sources.forEach(source->{
-				source.stopMessageGetting();
-			});
 			f_loopThread.setKeepGoing(false);
-			return true;
+			//Stop getting for each source, stop the thread and clear out the sources
+			if(f_sources != null) {
+				f_sources.forEach(source->{
+					source.stopMessageGetting();
+				}); 
+				f_sources.clear();
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 		else {
 			return false;
 		}
+		
 	}
 	public void writeFile(File fileToSave) {
 		try {
@@ -160,5 +180,9 @@ public class SMEDController {
 	}
 	public ArrayList<Message> getNonEventMessages() {
 		return f_nonEventMessages;
+	}
+	public void clearMessages() {
+		f_eventMessages.clear();
+		f_nonEventMessages.clear();
 	}
 }

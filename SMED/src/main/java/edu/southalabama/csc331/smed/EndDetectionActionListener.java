@@ -10,12 +10,14 @@ public class EndDetectionActionListener implements ActionListener{
 		this.f_gui = gui;
 	}
 	public void actionPerformed(ActionEvent e) {
+		//When activated disable the stop button
 		f_gui.disableStopButton();
 		//get the gui from the button
 		boolean successfulEnd = f_gui.getController().endProcessing();
 		if(!successfulEnd) {
 			JOptionPane.showMessageDialog(null,"No source was found to end processing");
 		}
+		//Enable the majority of GUI interaction
 		f_gui.enableKeyWordSearch();
 		f_gui.enableStartButton();
 		f_gui.enableScrolling();

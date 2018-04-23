@@ -15,7 +15,7 @@ public class DownloadTextActionListener implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		
 		
-		//Set gui's processingthread to sleep, if this exists
+		//Stop the GUI processing thread if it exists
 		// TODO figure out a better way to handle the GUi response problems, this case should probably completely stop until this is finished
 		if(f_gui.getController().getMessageProcessingThread()!= null)
 			f_gui.getController().getMessageProcessingThread().setKeepGoing(false);
@@ -33,6 +33,7 @@ public class DownloadTextActionListener implements ActionListener{
 		    File fileToSave = fileChooser.getSelectedFile();
 		    f_gui.getController().writeFile(fileToSave);
 		}
+		//restarts the thread when they are done
 		f_gui.getController().getMessageProcessingThread().setKeepGoing(true);
 		f_gui.getController().restartThread();
 	}

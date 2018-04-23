@@ -2,6 +2,7 @@ package edu.southalabama.csc331.smed;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -10,10 +11,10 @@ import org.junit.jupiter.api.Test;
 class MessageProcessingTest {
 
 	@Test
-	void test() throws InterruptedException {
+	void test() throws InterruptedException, IOException {
 		ArrayList<String> keyWords = new ArrayList<String>(Arrays.asList("A", "The", "Hello", "Trump", "Gun", "President", "Bomb", "War", "America", "Bill"));
 		MessageProcessor processor = new MessageProcessor(keyWords);
-		Source f_source = new Source("Twitter");
+		Source f_source = new Source("Reddit");
 		f_source.startMessageGetting();
 		Message message;
 		long startTime, endTime;

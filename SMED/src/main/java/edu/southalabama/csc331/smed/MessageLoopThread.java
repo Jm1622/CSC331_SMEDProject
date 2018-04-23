@@ -1,5 +1,8 @@
 package edu.southalabama.csc331.smed;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -12,14 +15,17 @@ public class MessageLoopThread implements Runnable {
 	private SMEDController f_controller;
 	private StringBuilder f_lock = new StringBuilder("Unlocked");
 	private Random f_numberGenerator = new Random();
+	File file = new File("/location.txt");
+	FileWriter fw;
 	//Constructor that adds a value to all four of these variables
 	// TODO replace gui with a controller class
-	public MessageLoopThread(ArrayList<Source> sources, boolean keepGoing, MessageProcessor processor, GUI gui, SMEDController controller) throws InterruptedException {
+	public MessageLoopThread(ArrayList<Source> sources, boolean keepGoing, MessageProcessor processor, GUI gui, SMEDController controller) throws InterruptedException, IOException {
 		this.f_sources = sources;
 		this.f_keepGoing = keepGoing;
 		this.f_processor = processor;
 		this.f_gui = gui;
 		this.f_controller = controller;
+		this.fw = new FileWriter(file, false);
 	}
 	public void run() {
 		//This overrides runnables run method, this is what runs on the thread
@@ -37,13 +43,14 @@ public class MessageLoopThread implements Runnable {
 					if(message.getMatchCount() > 0) {
 						f_controller.addEventMessage(message);
 						f_gui.addEventMessage(message.toString());
+						fw.append(message.getLocation());
 					}
 					else{
-						f_controller.addEventMessage(message);
+						f_controller.addNonEventMessage(message);
 						f_gui.addNonEventMessage(message.toString());
 					}
 					
-				} catch (InterruptedException e) {
+				} catch (InterruptedException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
