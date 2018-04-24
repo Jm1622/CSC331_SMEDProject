@@ -7,8 +7,10 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,6 +39,8 @@ public class Source {
 	private Hosts f_hosebirdHosts;
 	//The place we store our messages
 	private BlockingQueue<String> f_msgQueue = new LinkedBlockingQueue<String>(100000);
+	private PriorityQueue<String> f_redditMsgQueue = new PriorityQueue<String>(100);
+	private ArrayList<String> f_previousMessages = new ArrayList<String>();
 	private String redditUrl = "https://www.reddit.com/r/all/new.json";
 	//What type of source this is
 	private String f_type;
@@ -121,51 +125,67 @@ public class Source {
 			outputMessage.setMessageType("Tweet");
 		}
 		if(f_type.equals("Reddit")) {
+			boolean pull = false;
 			//Known problem here: since it is pulling the 25 most recent posts if there are not 25 new posts when it pulls
 			//It will repeat data
 			//If reddit check if the queue is empty
-			if(f_msgQueue.isEmpty()) {
-				//if so open a new get connection and read in the response
-				URL url = new URL(this.redditUrl);
-				HttpURLConnection con = (HttpURLConnection) url.openConnection();
-				con.setRequestMethod("GET");
-				con.setRequestProperty("User-Agent", "CSC 331 Smed Project. URL: https://github.com/Jm1622/CSC331_SMEDProject");
-				BufferedReader in = new BufferedReader(
-				        new InputStreamReader(con.getInputStream()));
-				String inputLine;
-				StringBuffer response = new StringBuffer();
-	
-				while ((inputLine = in.readLine()) != null) {
-					response.append(inputLine);
-				}
-				in.close();
-				//Get the selftext and author from the data and put it in message queue
-				String responseText = response.toString();
-				JsonReader jsonReader = Json.createReader(new StringReader(responseText));
-				message = jsonReader.readObject();
-				JsonObject data = message.getJsonObject("data");
-				JsonArray children = data.getJsonArray("children");
-				for(int i=0; i< children.size(); i++) {
-					JsonObject child = children.getJsonObject(i);
-					JsonObject childData = child.getJsonObject("data");
-					String queueString = "";
-					if(childData.getString("selftext") != null && !childData.getString("selftext").equals("")) {
-						queueString += childData.getString("selftext");
-						queueString += "`"+childData.getString("author");
-						f_msgQueue.put(queueString);
-					}
-				}
+			if(f_redditMsgQueue.isEmpty()) {
+				pull = fillRedditQueue();
 			}
-			//Take a message, separate it and set an output message
-			String msg = f_msgQueue.take();
-			List<String> messageAsList = Arrays.asList(msg.split("`"));
-			outputMessage.setText(messageAsList.get(0));
-			outputMessage.setUser(messageAsList.get(1));
-			outputMessage.setMessageType("Reddit");
+			//Pull until we have something
+			while(!pull) {
+				pull = fillRedditQueue();
+			}
+			String msg = f_redditMsgQueue.poll();
+			System.out.println("Message retrieved "+System.currentTimeMillis());
+			if(msg != null) {
+				List<String> messageAsList = Arrays.asList(msg.split("`"));
+				outputMessage.setText(messageAsList.get(0));
+				outputMessage.setUser(messageAsList.get(1));
+				outputMessage.setMessageType("Reddit");
+			}
 		}
 		return outputMessage;
 	}
 	public String getType() {
 		return f_type;
+	}
+	//This returns a message on if it was able to get new items in the queue
+	private boolean fillRedditQueue() throws IOException {
+		//if so open a new get connection and read in the response
+		URL url = new URL(this.redditUrl);
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		con.setRequestProperty("User-Agent", "CSC 331 Smed Project. URL: https://github.com/Jm1622/CSC331_SMEDProject");
+		BufferedReader in = new BufferedReader(
+		        new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		}
+		in.close();
+		//Get the selftext and author from the data and put it in message queue
+		String responseText = response.toString();
+		JsonReader jsonReader = Json.createReader(new StringReader(responseText));
+		JsonObject message = jsonReader.readObject();
+		JsonObject data = message.getJsonObject("data");
+		JsonArray children = data.getJsonArray("children");
+		for(int i=0; i< children.size(); i++) {
+			JsonObject child = children.getJsonObject(i);
+			JsonObject childData = child.getJsonObject("data");
+			String queueString = "";
+			if(childData.getString("selftext") != null && !childData.getString("selftext").equals("")) {
+				queueString += childData.getString("selftext");
+				queueString += "`"+childData.getString("author");
+				if(!this.f_previousMessages.contains(queueString)){
+					f_redditMsgQueue.add(queueString);
+					f_previousMessages.add(queueString);
+				}
+			}
+		}
+		return !this.f_redditMsgQueue.isEmpty();
+		
 	}
 }

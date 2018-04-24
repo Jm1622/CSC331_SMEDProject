@@ -3,6 +3,7 @@ package edu.southalabama.csc331.smed;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,7 +16,7 @@ public class MessageLoopThread implements Runnable {
 	private SMEDController f_controller;
 	private StringBuilder f_lock = new StringBuilder("Unlocked");
 	private Random f_numberGenerator = new Random();
-	File file = new File("/location.txt");
+	File file = new File(System.getProperty("user.dir")+"/locations.txt");
 	FileWriter fw;
 	//Constructor that adds a value to all four of these variables
 	// TODO replace gui with a controller class

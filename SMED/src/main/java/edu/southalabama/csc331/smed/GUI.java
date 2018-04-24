@@ -73,7 +73,7 @@ public class GUI extends javax.swing.JPanel{
         title.setName("title"); // NOI18N
 
         logo.setForeground(new java.awt.Color(255, 255, 255));
-        logo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons8-geography-50.png"))); // NOI18N
+        logo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon.png"))); // NOI18N
 
         titleSource.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         titleSource.setForeground(new java.awt.Color(255, 255, 255));
@@ -355,7 +355,8 @@ public class GUI extends javax.swing.JPanel{
 	    ScrollPane scrollPane = new ScrollPane();
 	    scrollPane.setContent(browser);
 	    scrollPane.setMaxSize(500, 500);
-	    webEngine.load(getClass().getResource("/Map.html").toURI().toString());
+	    File webpage = new File(System.getProperty("user.dir")+"/Map.html");
+	    webEngine.load(webpage.toURI().toString());
 	    scene.setRoot(scrollPane);
 	    
 	   
